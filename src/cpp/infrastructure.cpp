@@ -12,11 +12,27 @@ namespace aivy {
 std::string Infrastructure::resolveSafePath(const std::string& relative_path) {
     try {
         fs::path base_path = fs::current_path() / "data";
-        fs::path full_path = fs::canonical(base_path / relative_path);
         
-        // Ensure the path is within the data directory (prevent directory traversal)
+        // Create base path if it doesn't exist
+        if (!fs::exists(base_path)) {
+            fs::create_directories(base_path);
+        }
+        
+        // Resolve the full path (without requiring the file to exist)
+        fs::path full_path = base_path / relative_path;
+        
+        // Normalize the path to handle .. and . components
+        full_path = full_path.lexically_normal();
+        
+        // Get canonical base path
         auto canonical_base = fs::canonical(base_path);
-        if (full_path.string().find(canonical_base.string()) == 0) {
+        
+        // Check if the normalized path starts with the base path
+        // This prevents directory traversal attacks
+        auto full_path_str = full_path.string();
+        auto base_path_str = canonical_base.string();
+        
+        if (full_path_str.find(base_path_str) == 0) {
             return full_path.string();
         } else {
             std::cerr << "Path traversal attempt detected: " << relative_path << std::endl;

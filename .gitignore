@@ -46,6 +46,7 @@ bin/
 lib/
 dist/
 cmake-build-*/
+external/
 
 # CMake files
 CMakeCache.txt
