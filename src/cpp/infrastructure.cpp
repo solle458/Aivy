@@ -18,26 +18,33 @@ std::string Infrastructure::resolveSafePath(const std::string& relative_path) {
             fs::create_directories(base_path);
         }
         
+        // Get canonical base path
+        auto canonical_base = fs::canonical(base_path);
+        
         // Resolve the full path (without requiring the file to exist)
         fs::path full_path = base_path / relative_path;
         
         // Normalize the path to handle .. and . components
         full_path = full_path.lexically_normal();
         
-        // Get canonical base path
-        auto canonical_base = fs::canonical(base_path);
+        // Make it absolute if it isn't already
+        if (!full_path.is_absolute()) {
+            full_path = fs::absolute(full_path);
+        }
         
-        // Check if the normalized path starts with the base path
-        // This prevents directory traversal attacks
-        auto full_path_str = full_path.string();
-        auto base_path_str = canonical_base.string();
+        // Use lexically_relative to check if full_path is within canonical_base
+        // If the path escapes the base directory, lexically_relative will fail
+        // or produce a path that starts with ".."
+        fs::path relative_to_base = full_path.lexically_relative(canonical_base);
         
-        if (full_path_str.find(base_path_str) == 0) {
-            return full_path.string();
-        } else {
+        // Check if the path tries to escape (starts with ..)
+        if (relative_to_base.empty() || 
+            relative_to_base.string().substr(0, 2) == "..") {
             std::cerr << "Path traversal attempt detected: " << relative_path << std::endl;
             return "";
         }
+        
+        return full_path.string();
     } catch (const fs::filesystem_error& e) {
         std::cerr << "Path resolution error: " << e.what() << std::endl;
         return "";

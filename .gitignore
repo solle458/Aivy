@@ -48,6 +48,9 @@ dist/
 cmake-build-*/
 external/
 
+# Data directory (runtime data)
+data/
+
 # CMake files
 CMakeCache.txt
 CMakeFiles/
