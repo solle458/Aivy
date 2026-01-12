@@ -39,3 +39,45 @@
 
 # debug information files
 *.dwo
+
+# Build directories
+build/
+bin/
+lib/
+dist/
+cmake-build-*/
+external/
+
+# Data directory (runtime data)
+data/
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+*.egg-info/
+.eggs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
